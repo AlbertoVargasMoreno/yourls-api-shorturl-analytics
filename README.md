@@ -16,7 +16,7 @@ This plugin requires YOURLS version 1.7.3 and above and Php >= 7.0.
 
 ## Installation
 Download the latest release from the releases page.
-Extract the contents to a folder named yourls-api-shorturl-analytics within the /user/plugins directory of your Yourls installation.
+Extract the contents to a folder named `yourls-api-shorturl-analytics` within the `/user/plugins` directory of your Yourls installation.
 Activate the plugin from the Plugins administration page (http://yourls-site.com/admin/plugins.php).
 You're ready to go!
 License
@@ -33,7 +33,7 @@ This plugin extends Yourls API functionality to include a custom action for retr
 ### Example - Stats for a specific date
 
 ```bash
-curl -X GET "http://yourls-site.com/yourls-api.php?signature=YuorSignature&action=shorturl_analytics&date=2024-01-01&shorturl=abc123"
+curl -X GET "http://yourls-site.com/yourls-api.php?signature=YourSignature&action=shorturl_analytics&date=2024-01-01&shorturl=abc123"
 ```
 ```bash
 # Sample result for a specific date
@@ -54,7 +54,7 @@ curl -X GET "http://yourls-site.com/yourls-api.php?signature=YuorSignature&actio
 ### Example - Stats for a date range
 
 ```bash
-curl -X GET "http://yourls-site.com/yourls-api.php?signature=YuorSignature&action=shorturl_analytics&date=2024-01-01&date_and=2024-12-31&shorturl=abc123"
+curl -X GET "http://yourls-site.com/yourls-api.php?signature=YourSignature&action=shorturl_analytics&date=2024-01-01&date_end=2024-12-31&shorturl=abc123"
 ```
 
 ```bash
