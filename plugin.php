@@ -119,7 +119,7 @@ function extractStats($shorturl, $date_start, $date_end = null)
         $daily_clicks = $ydb->fetchPairs($sql_count_by_day, ['shorturl' => $shorturl, 'date_start' => $date_start, 'date_end' => $date_end]);
         // Get User Agents
         $ua_clicks = $ydb->fetchObjects($sql_devices, ['shorturl' => $shorturl]);
-        $devicesStats = dissectUa($ua_clicks);
+        $devicesStats = dissectUserAgent($ua_clicks);
     } catch (\Throwable $e) {
         var_dump($e->getMessage()); die;
     }
@@ -174,7 +174,7 @@ function getDateRange($startDate, $endDate): array
     return $results;
 }
 
-function dissectUa(array $clicks_logs) : array
+function dissectUserAgent(array $clicks_logs) : array
 {
     $result_array = [
         'device'    => [],
