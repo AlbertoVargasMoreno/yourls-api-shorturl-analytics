@@ -79,3 +79,9 @@ curl -X GET "http://yourls-site.com/yourls-api.php?signature=YourSignature&actio
 
 ## Author
 Created by [Stefano Franco](https://github.com/stefanofranco/yourls-api-shorturl-analytics).
+
+## 
+
+```
+http://sho.rt/go/yourls-api.php?signature=7fab49eaf3&action=shorturl_analytics&date=2024-01-01&date_end=2024-12-31&shorturl=tadalafil&format=json
+```
