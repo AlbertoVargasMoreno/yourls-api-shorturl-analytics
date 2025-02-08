@@ -3,7 +3,7 @@
 Plugin Name: API ShortURL Analytics
 Plugin URI: https://github.com/stefanofranco/yourls-api-shorturl-analytics
 Description: This plugin defines a custom API action 'shorturl_analytics'
-Version: 1.0.0
+Version: 1.0.1
 Author: Stefano Franco
 Author URI: https://github.com/stefanofranco/
 */
@@ -77,39 +77,53 @@ function parametersValidations() {
 function extractStats($shorturl, $date_start, $date_end = null)
 {
     global $ydb;
-
-    if (!empty($date_start)) {
-
-        $date_end = ($date_end ?? $date_start);
-        $datesRange = getDateRange($date_start, ($date_end ?? $date_start));
-
-        // Date must be in YYYY-MM-DD format
-        $date_start .= ' 00:00:00';
-        $date_end .= ' 23:59:59';
-
-        try {
-            // Count total numbers of click
-            $total_clicks = $ydb->fetchOne("SELECT COUNT(*) as count FROM " . YOURLS_DB_TABLE_LOG . " WHERE `shorturl` = :shorturl", ['shorturl' => $shorturl]);
-
-            // Count total numbers of click for any date in the range
-            $daily_clicks = $ydb->fetchPairs("SELECT DATE(`click_time`) as date, COUNT(*) as count FROM " . YOURLS_DB_TABLE_LOG . " WHERE `shorturl` = :shorturl AND `click_time` BETWEEN :date_start AND :date_end GROUP BY `date`", ['shorturl' => $shorturl, 'date_start' => $date_start, 'date_end' => $date_end]);
-        } catch (\Throwable $e) {
-            var_dump($e->getMessage()); die;
-        }
-
-        $results = [
-            'total_clicks' => (int) $total_clicks[array_key_first($total_clicks)],
-            'range_clicks' => 0,
-            'daily_clicks' => [],
-        ];
-        foreach ($datesRange as $date) {
-            $results['daily_clicks'][$date] = (int) ($daily_clicks[$date] ?? 0);
-            $results['range_clicks'] += $results['daily_clicks'][$date];
-        }
-
-        return $results;
+    $table_log = YOURLS_DB_TABLE_LOG;
+    if (empty($date_start)) {
+        return [];
     }
-    return [];
+
+    $date_end = ($date_end ?? $date_start);
+    $datesRange = getDateRange($date_start, ($date_end ?? $date_start));
+
+    // Date must be in YYYY-MM-DD format
+    $date_start .= ' 00:00:00';
+    $date_end .= ' 23:59:59';
+
+    // Count total numbers of click
+    $sql_count_total = "SELECT
+    COUNT(*) AS count
+    FROM $table_log
+    WHERE `shorturl` = :shorturl
+    ";
+
+    // Count total numbers of click for any date in the range
+    $sql_count_by_day = "SELECT
+    DATE(`click_time`) AS date
+    , COUNT(*) AS count
+    FROM $table_log
+    WHERE `shorturl` = :shorturl
+    AND `click_time` BETWEEN :date_start AND :date_end
+    GROUP BY `date`
+    ";
+
+    try {
+        $total_clicks = $ydb->fetchOne($sql_count_total, ['shorturl' => $shorturl]);
+        $daily_clicks = $ydb->fetchPairs($sql_count_by_day, ['shorturl' => $shorturl, 'date_start' => $date_start, 'date_end' => $date_end]);
+    } catch (\Throwable $e) {
+        var_dump($e->getMessage()); die;
+    }
+
+    $results = [
+        'total_clicks' => (int) $total_clicks[array_key_first($total_clicks)],
+        'range_clicks' => 0,
+        'daily_clicks' => [],
+    ];
+    foreach ($datesRange as $date) {
+        $results['daily_clicks'][$date] = (int) ($daily_clicks[$date] ?? 0);
+        $results['range_clicks'] += $results['daily_clicks'][$date];
+    }
+
+    return $results;
 }
 
 /**
