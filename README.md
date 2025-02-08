@@ -7,12 +7,15 @@
 
 Yourls API ShortURL Analytics is a plugin for Yourls that provides analytics for short URLs via a custom API action. This plugin allows users to retrieve detailed statistics for short URLs within a specified date range.
 
+This branch add User Agent details: devices, platforms, browsers
+
 ## Requirements
 
 This plugin requires YOURLS version 1.7.3 and above and Php >= 7.0.
 
 **Note**: Please, if you've tested it with other versions and it works fine, contact me and I will update this section.
 
+Previously Install the required dependency, navigate to the root directory of your YOURLS installation and run the following command: `composer require whichbrowser/parser`.
 
 ## Installation
 Download the latest release from the releases page.
@@ -46,6 +49,18 @@ curl -X GET "http://yourls-site.com/yourls-api.php?signature=YourSignature&actio
     "range_clicks": 15, # Total clicks (in the range)
     "daily_clicks": {
       "2024-01-01": 15 # Total clicks (in the specific date)
+    },
+   "clicks_by_device": {
+     "Mobile": 10,
+     "Desktop": 5
+    },
+   "clicks_by_browser": {
+      "Safari": 10,
+      "Chrome": 5,
+    },
+   "clicks_by_platform": {
+      "IOS": 10,
+      "Windows": 5,
     }
   }
 }
@@ -72,6 +87,18 @@ curl -X GET "http://yourls-site.com/yourls-api.php?signature=YourSignature&actio
           "2024-01-03": 1,
           "2024-01-04": 0,
           "2024-01-05": 0
+        },
+        "clicks_by_device": {
+          "Mobile": 10,
+          "Desktop": 14
+        },
+        "clicks_by_browser": {
+          "Safari": 10,
+          "Chrome": 14,
+        },
+        "clicks_by_platform": {
+          "IOS": 10,
+          "Windows": 14,
         }
     }
 }
@@ -79,9 +106,3 @@ curl -X GET "http://yourls-site.com/yourls-api.php?signature=YourSignature&actio
 
 ## Author
 Created by [Stefano Franco](https://github.com/stefanofranco/yourls-api-shorturl-analytics).
-
-## 
-
-```
-http://sho.rt/go/yourls-api.php?signature=7fab49eaf3&action=shorturl_analytics&date=2024-01-01&date_end=2024-12-31&shorturl=tadalafil&format=json
-```

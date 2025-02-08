@@ -3,7 +3,7 @@
 Plugin Name: API ShortURL Analytics
 Plugin URI: https://github.com/stefanofranco/yourls-api-shorturl-analytics
 Description: This plugin defines a custom API action 'shorturl_analytics'
-Version: 1.0.0
+Version: 2.0.0
 Author: Stefano Franco
 Author URI: https://github.com/stefanofranco/
 */
