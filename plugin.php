@@ -110,6 +110,7 @@ function extractStats($shorturl, $date_start, $date_end = null)
     user_agent 
     FROM `$table_log` 
     WHERE shorturl=:shorturl
+    AND `click_time` BETWEEN :date_start AND :date_end
     ";
 
     try {
@@ -118,7 +119,7 @@ function extractStats($shorturl, $date_start, $date_end = null)
         // Count total numbers of click for any date in the range
         $daily_clicks = $ydb->fetchPairs($sql_count_by_day, ['shorturl' => $shorturl, 'date_start' => $date_start, 'date_end' => $date_end]);
         // Get User Agents
-        $ua_clicks = $ydb->fetchObjects($sql_devices, ['shorturl' => $shorturl]);
+        $ua_clicks = $ydb->fetchObjects($sql_devices, ['shorturl' => $shorturl, 'date_start' => $date_start, 'date_end' => $date_end]);
         $devicesStats = dissectUserAgent($ua_clicks);
     } catch (\Throwable $e) {
         var_dump($e->getMessage()); die;
@@ -128,7 +129,7 @@ function extractStats($shorturl, $date_start, $date_end = null)
         'total_clicks' => (int) $total_clicks[array_key_first($total_clicks)],
         'range_clicks' => 0,
         'daily_clicks' => [],
-        'clicks_by_device' => $devicesStats['device'],
+        'clicks_by_device'  => $devicesStats['device'],
         'clicks_by_browser' => $devicesStats['browser'],
         'clicks_by_platform' => $devicesStats['platform']
     ];
@@ -179,7 +180,7 @@ function dissectUserAgent(array $clicks_logs) : array
     $result_array = [
         'device'    => [],
         'browser'   => [],
-        'platform' => []
+        'platform'  => []
     ];
 
     if (!$clicks_logs) {
