@@ -16,13 +16,32 @@ yourls_add_filter('api_action_shorturl_analytics', 'shorturl_analytics');
  */
 function shorturl_analytics(): array
 {
-
-    // The date parameter must exist
-    if( !isset( $_REQUEST['date'] ) ) {
+    try {
+        parametersValidations();
+    } catch (\Throwable $e) {
         return [
             'statusCode' => 400,
-            'message'    => 'Missing date parameter',
+            'message'    => $e->getMessage(),
         ];
+    }
+    $date_start = $_REQUEST['date'];
+    $date_end   = $_REQUEST['date_end'] ?? $date_start;
+    $shorturl   = $_REQUEST['shorturl'];
+    $stats = extractStats($shorturl, $date_start, $date_end);
+    return [
+        'statusCode' => 200,
+        'message'    => 'success',
+        'stats'     => $stats
+    ];
+}
+
+/**
+ * @throws \Exception
+ */
+function parametersValidations() {
+    // The date parameter must exist
+    if( !isset( $_REQUEST['date'] ) ) {
+        throw new Exception("Missing date parameter");
     }
     $date_start = $_REQUEST['date'];
     $date_end = $_REQUEST['date_end'] ?? $date_start;
@@ -32,44 +51,24 @@ function shorturl_analytics(): array
         !checkDateFormat($date_start) ||
         !checkDateFormat($date_end)
     ) {
-        return [
-            'statusCode' => 400,
-            'message'    => 'Wrong date format',
-        ];
+        throw new Exception("Wrong date format");
     }
 
     // Check if "date_end" is not smaller than "date_start"
     if( $date_end < $date_start ) {
-        return [
-            'statusCode' => 400,
-            'message'    => 'The date_end parameter cannot be smaller than date',
-        ];
+        throw new Exception('The date_end parameter cannot be smaller than date');
     }
 
     // Need 'shorturl' parameter
     if( !isset( $_REQUEST['shorturl'] ) ) {
-        return [
-            'statusCode' => 400,
-            'message'    => 'Missing shorturl parameter',
-        ];
+        throw new Exception('Missing shorturl parameter');
     }
     $shorturl = $_REQUEST['shorturl'];
 
     // Check if valid shorturl
     if( !yourls_is_shorturl( $shorturl ) ) {
-        return [
-            'statusCode' => 404,
-            'message'    => 'Not found',
-        ];
+        throw new Exception("Not Found");
     }
-
-    $stats = extractStats($shorturl, $date_start, $date_end);
-    return [
-        'statusCode' => 200,
-        'message'    => 'success',
-        'stats'     => $stats
-    ];
-
 }
 
 /**
